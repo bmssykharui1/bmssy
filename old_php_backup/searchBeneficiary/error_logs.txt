@@ -1,0 +1,20 @@
+[2025-04-23 23:09:13] ERROR: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+Stack Trace: SyntaxError: Unexpected end of JSON input
+    at https://mamatajana.infinityfreeapp.com/searchBeneficiary/:354:30
+
+[2025-04-23 23:09:48] ERROR: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+Stack Trace: SyntaxError: Unexpected end of JSON input
+    at https://mamatajana.infinityfreeapp.com/searchBeneficiary/:354:30
+
+[2025-04-23 23:11:19] ERROR: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+Stack Trace: SyntaxError: Unexpected end of JSON input
+    at https://mamatajana.infinityfreeapp.com/searchBeneficiary/:354:30
+
+[2025-04-23 23:11:44] ERROR: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+Stack Trace: SyntaxError: Unexpected end of JSON input
+    at https://mamatajana.infinityfreeapp.com/searchBeneficiary/:354:30
+
+[2025-04-23 23:12:30] ERROR: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+Stack Trace: SyntaxError: Unexpected end of JSON input
+    at https://mamatajana.infinityfreeapp.com/searchBeneficiary/:354:30
+

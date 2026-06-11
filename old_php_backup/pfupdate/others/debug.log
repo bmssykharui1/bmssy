@@ -1,0 +1,11 @@
+Array
+(
+    [beneficiary_name] => DEBASHIS SAMANTA
+    [approved_ssin] => 142070024175
+    [period_from] => 2026-01-01
+    [period_to] => 2026-03-31
+)
+SQL Query: INSERT INTO pf_update 
+                     (beneficiary_name, approved_ssin, status, date, beneficiary_id, period_form, period_to, last_update) 
+                     VALUES (?, ?, 'accepted', ?, ?, ?, ?, ?)
+Inserting: ID=1753, From=2026-01-01, To=2026-03-31
