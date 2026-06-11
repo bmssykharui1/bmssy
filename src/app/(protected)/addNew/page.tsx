@@ -39,7 +39,7 @@ export default function AddNewPage() {
     setIsChecking(true);
     
     // Optional: keeping the SweetAlert minimal if they still want it, but the button loader is now primary
-    const result = await checkSSINAction(ssin);
+    const result = await checkSSINAction(ssin) as any;
     
     setIsChecking(false);
 
@@ -83,7 +83,7 @@ export default function AddNewPage() {
     formData.append('date', dateOf60);
     formData.append('phone', phone);
 
-    const result = await submitSSINAction(formData);
+    const result = await submitSSINAction(formData) as any;
     
     setIsSubmitting(false);
 
