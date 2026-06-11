@@ -113,7 +113,7 @@ export default function Form4DownloadPage() {
       },
 
       didDrawPage: function (hookData) {
-        const pageNumber = doc.internal.getNumberOfPages();
+        // Removed unused pageNumber variable that caused TS error
         
         // Headers
         doc.setFont("helvetica", "bold");
