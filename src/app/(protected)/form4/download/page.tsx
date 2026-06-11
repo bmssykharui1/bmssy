@@ -108,7 +108,7 @@ export default function Form4DownloadPage() {
       willDrawCell: function(data) {
         // Accumulate subtotal right before drawing the cell on the current page
         if (data.section === 'body' && data.column.index === 7) {
-          pageSubTotal += parseFloat(data.cell.raw || "0");
+          pageSubTotal += parseFloat(String(data.cell.raw) || "0");
         }
       },
 
