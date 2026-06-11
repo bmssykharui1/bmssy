@@ -20,21 +20,28 @@ export default function LoginPage() {
     const formData = new FormData(e.currentTarget);
     const result = await loginAgent(formData);
 
+    const Toast = MySwal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', MySwal.stopTimer)
+        toast.addEventListener('mouseleave', MySwal.resumeTimer)
+      }
+    });
+
     if (result?.error) {
       setLoading(false);
-      MySwal.fire({
+      Toast.fire({
         icon: 'error',
-        title: 'Login Failed',
-        text: result.error,
-        confirmButtonColor: 'var(--primary)'
+        title: result.error
       });
     } else {
-      MySwal.fire({
+      Toast.fire({
         icon: 'success',
-        title: 'Login Successful',
-        text: 'Redirecting to dashboard...',
-        showConfirmButton: false,
-        timer: 1500
+        title: 'Login Successful'
       }).then(() => {
         router.push('/dashboard');
       });
