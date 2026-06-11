@@ -4,25 +4,40 @@ import { useState } from 'react';
 import { loginAgent } from './actions/auth';
 import { UserCircle2, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
     const formData = new FormData(e.currentTarget);
     const result = await loginAgent(formData);
 
     if (result?.error) {
-      setError(result.error);
       setLoading(false);
+      MySwal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: result.error,
+        confirmButtonColor: 'var(--primary)'
+      });
     } else {
-      router.push('/dashboard');
+      MySwal.fire({
+        icon: 'success',
+        title: 'Login Successful',
+        text: 'Redirecting to dashboard...',
+        showConfirmButton: false,
+        timer: 1500
+      }).then(() => {
+        router.push('/dashboard');
+      });
     }
   }
 
@@ -51,8 +66,6 @@ export default function LoginPage() {
               autoComplete="off"
             />
           </div>
-
-          {error && <div className="error-message">{error}</div>}
 
           <button type="submit" className="btn-primary" disabled={loading} style={{ marginTop: '1.5rem' }}>
             {loading ? (
