@@ -87,7 +87,7 @@ export default function Form4DownloadPage() {
 
     autoTable(doc, {
       startY: 35,
-      head: headers,
+      head: headers as any,
       body: bodyData,
       theme: 'grid',
       styles: { font: "helvetica", fontSize: 7.5, cellPadding: 2, lineWidth: 0.2, lineColor: [0, 0, 0] },
