@@ -6,14 +6,14 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <div className="header">
-        <div>
-          <h1 className="page-title" style={{ fontSize: '1.5rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <header className="app-topbar">
+        <div className="topbar-left">
+          <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <LayoutDashboard size={28} style={{ color: 'var(--primary)' }} />
             Overview
           </h1>
         </div>
-      </div>
+      </header>
 
       <div className="content-scroll">
         
@@ -71,7 +71,7 @@ export default async function DashboardPage() {
             <div className="card-label">PF OTHERS</div>
             <div className="card-value" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <CheckCircle2 size={28} color="var(--color-success)" />
-              ₹{stats.pf142.toLocaleString()}
+              {stats.pf142}
             </div>
           </div>
           <div className="md-card">
@@ -79,7 +79,7 @@ export default async function DashboardPage() {
             <div className="card-label">PF CONTRACTIONS</div>
             <div className="card-value" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <FileCheck size={28} color="var(--color-warning)" />
-              ₹{stats.pf242.toLocaleString()}
+              {stats.pf242}
             </div>
           </div>
           <div className="md-card">

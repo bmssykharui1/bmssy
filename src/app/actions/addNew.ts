@@ -9,9 +9,9 @@ export async function checkSSINAction(ssin: string) {
 
   const client = await pool.connect();
   try {
-    // 1. Check Beneficiary
+    // 1. Check Beneficiary (removed status column, using remark if available, else active)
     const benRes = await client.query(`
-      SELECT beneficiary_name, date_of_attaining_60, approved_ssin, phone_no, status, last_update 
+      SELECT beneficiary_name, date_of_attaining_60, approved_ssin, phone_no, remark, last_update 
       FROM beneficiaries 
       WHERE approved_ssin = $1
     `, [ssin]);
@@ -22,11 +22,17 @@ export async function checkSSINAction(ssin: string) {
 
     const row = benRes.rows[0];
     
-    // Formatting date helper for Postgres DATE type
     const formatDate = (dateObj: Date) => {
       const d = new Date(dateObj);
       return `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth()+1).toString().padStart(2, '0')}-${d.getFullYear()}`;
     };
+
+    let status = 'ACTIVE';
+    if (row.remark && row.remark.toLowerCase().includes('reject')) {
+      status = 'REJECTED';
+    } else if (row.remark && row.remark.toLowerCase().includes('inactive')) {
+      status = 'INACTIVE';
+    }
 
     const response = {
       exists: true,
@@ -34,29 +40,43 @@ export async function checkSSINAction(ssin: string) {
       name: row.beneficiary_name,
       date_of_attaining_60: formatDate(row.date_of_attaining_60),
       phone_no: row.phone_no,
-      status: row.status,
+      status: status,
       last_update: row.last_update ? row.last_update.toISOString() : null,
       pf_updates: [] as any[],
       total_amount: 0
     };
 
-    // 2. Fetch PF Updates
+    // 2. Fetch PF Updates (calculating months/amount manually since they aren't in DB)
     const pfRes = await client.query(`
-      SELECT period_from, period_to, last_update, amount, months 
+      SELECT period_form, period_to, last_update
       FROM pf_update 
-      WHERE approved_ssin = $1 AND status = 'Accepted'
+      WHERE approved_ssin = $1
     `, [ssin]);
 
     let totalAmount = 0;
 
     for (const pfRow of pfRes.rows) {
-      totalAmount += parseFloat(pfRow.amount);
+      if (!pfRow.period_form || !pfRow.period_to) continue;
+
+      const from = new Date(pfRow.period_form);
+      const to = new Date(pfRow.period_to);
+      to.setDate(to.getDate() + 1);
+
+      let months = (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth());
+      if (to.getDate() > from.getDate()) {
+        months++;
+      }
+      if (months <= 0) months = 1;
+
+      const amount = months * 55;
+      totalAmount += amount;
+
       response.pf_updates.push({
-        period_from: formatDate(pfRow.period_from),
+        period_from: formatDate(pfRow.period_form),
         period_to: formatDate(pfRow.period_to),
         last_update: pfRow.last_update ? pfRow.last_update.toISOString() : null,
-        months: pfRow.months,
-        amount: parseFloat(pfRow.amount)
+        months: months,
+        amount: amount
       });
     }
 
@@ -83,20 +103,19 @@ export async function submitSSINAction(formData: FormData) {
 
   const client = await pool.connect();
   try {
-    // Check if it exists
     const checkRes = await client.query('SELECT approved_ssin FROM beneficiaries WHERE approved_ssin = $1', [ssin]);
     if (checkRes.rows.length > 0) {
       return { error: 'SSIN already exists' };
     }
 
-    const status = 'active';
     const now = new Date();
     
+    // Instead of inserting 'status', we insert 'remark' as active if needed, or leave null.
     await client.query(`
       INSERT INTO beneficiaries 
-      (approved_ssin, beneficiary_name, date_of_attaining_60, phone_no, status, last_update, created_at) 
-      VALUES ($1, $2, $3, $4, $5, $6, CURRENT_DATE)
-    `, [ssin, name.toUpperCase(), date_of_attaining_60, phone_no, status, now]);
+      (approved_ssin, beneficiary_name, date_of_attaining_60, phone_no, remark, last_update, created_at) 
+      VALUES ($1, $2, $3, $4, 'ACTIVE', $5, CURRENT_DATE)
+    `, [ssin, name.toUpperCase(), date_of_attaining_60, phone_no, now]);
 
     return { success: true };
   } catch (error: any) {

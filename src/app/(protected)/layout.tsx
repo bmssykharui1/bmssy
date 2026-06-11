@@ -17,9 +17,9 @@ export default async function DashboardLayout({
   const agent = JSON.parse(sessionData.value);
 
   return (
-    <div className="dashboard-layout">
+    <div className="app-scaffold">
       <Sidebar agent={agent} />
-      <main className="main-content">
+      <main className="app-main">
         {children}
       </main>
     </div>

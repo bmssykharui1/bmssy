@@ -23,8 +23,10 @@ export default function Sidebar({ agent }: { agent: { id: string, name: string, 
 
   const toggleMenu = (menu: string) => {
     setOpenMenus(prev => ({
-      ...prev,
-      [menu]: !prev[menu]
+      pfupdate: menu === 'pfupdate' ? !prev.pfupdate : false,
+      ds: menu === 'ds' ? !prev.ds : false,
+      list: menu === 'list' ? !prev.list : false,
+      form4: menu === 'form4' ? !prev.form4 : false
     }));
   };
 
@@ -61,7 +63,7 @@ export default function Sidebar({ agent }: { agent: { id: string, name: string, 
 
         {/* PF Updation */}
         <div>
-          <button className={`sb-item ${openMenus.pfupdate ? 'active' : ''}`} onClick={() => toggleMenu('pfupdate')}>
+          <button className={`sb-item ${pathname.startsWith('/pfupdate') ? 'active' : ''}`} onClick={() => toggleMenu('pfupdate')}>
             <div className="sb-item-left" style={{ color: '#6750a4' }}>
               <FileCheck size={20} />
               <span>PF Updation</span>
@@ -83,7 +85,7 @@ export default function Sidebar({ agent }: { agent: { id: string, name: string, 
 
         {/* Duare Sorkar */}
         <div>
-          <button className={`sb-item ${openMenus.ds ? 'active' : ''}`} onClick={() => toggleMenu('ds')}>
+          <button className={`sb-item ${pathname.startsWith('/ds') ? 'active' : ''}`} onClick={() => toggleMenu('ds')}>
             <div className="sb-item-left" style={{ color: '#b36b00' }}>
               <Users size={20} />
               <span>Duare Sorkar</span>
@@ -105,7 +107,7 @@ export default function Sidebar({ agent }: { agent: { id: string, name: string, 
 
         {/* Lists */}
         <div>
-          <button className={`sb-item ${openMenus.list ? 'active' : ''}`} onClick={() => toggleMenu('list')}>
+          <button className={`sb-item ${pathname.startsWith('/list') ? 'active' : ''}`} onClick={() => toggleMenu('list')}>
             <div className="sb-item-left" style={{ color: '#b3261e' }}>
               <List size={20} />
               <span>Lists</span>
@@ -130,7 +132,7 @@ export default function Sidebar({ agent }: { agent: { id: string, name: string, 
 
         {/* Form 4 */}
         <div>
-          <button className={`sb-item ${openMenus.form4 ? 'active' : ''}`} onClick={() => toggleMenu('form4')}>
+          <button className={`sb-item ${pathname.startsWith('/form4') ? 'active' : ''}`} onClick={() => toggleMenu('form4')}>
             <div className="sb-item-left" style={{ color: '#0d9488' }}>
               <FilePlus size={20} />
               <span>Form 4</span>
