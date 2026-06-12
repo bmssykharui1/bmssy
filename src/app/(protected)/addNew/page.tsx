@@ -2,11 +2,8 @@
 
 import { useState } from 'react';
 import { checkSSINAction, submitSSINAction } from '@/app/actions/addNew';
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
 import { Search, PlusCircle, CheckCircle2, AlertCircle, FileCheck, RefreshCw, Smartphone, Calendar, User, Hash, Loader2, Sparkles } from 'lucide-react';
-
-const MySwal = withReactContent(Swal);
+import { toast } from 'sonner';
 
 export default function AddNewPage() {
   const [ssin, setSsin] = useState('');
@@ -22,17 +19,9 @@ export default function AddNewPage() {
   const [dateOf60, setDateOf60] = useState('');
   const [phone, setPhone] = useState('');
 
-  const Toast = MySwal.mixin({
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true,
-  });
-
   const handleCheck = async () => {
     if (ssin.length !== 12) {
-      Toast.fire({ icon: 'error', title: 'SSIN must be exactly 12 digits' });
+      toast.error('SSIN must be exactly 12 digits');
       return;
     }
 
@@ -44,7 +33,7 @@ export default function AddNewPage() {
     setIsChecking(false);
 
     if (result.error) {
-      Toast.fire({ icon: 'error', title: result.error });
+      toast.error(result.error);
       return;
     }
 
@@ -52,11 +41,11 @@ export default function AddNewPage() {
       setProfile(result);
       setShowExistingData(true);
       setShowNewData(false);
-      Toast.fire({ icon: 'success', title: 'SSIN Found in Database' });
+      toast.success('SSIN Found in Database');
     } else {
       setShowExistingData(false);
       setShowNewData(true);
-      Toast.fire({ icon: 'info', title: 'New SSIN. Please fill the details.' });
+      toast.info('New SSIN. Please fill the details.');
     }
   };
 
@@ -88,9 +77,9 @@ export default function AddNewPage() {
     setIsSubmitting(false);
 
     if (result.error) {
-      Toast.fire({ icon: 'error', title: result.error });
+      toast.error(result.error);
     } else {
-      Toast.fire({ icon: 'success', title: 'Data Saved Successfully!' });
+      toast.success('Data Saved Successfully!');
       // Reset Form
       setSsin('');
       setName('');

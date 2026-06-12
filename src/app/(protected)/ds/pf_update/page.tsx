@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { getDSPendingPFUpdates, saveDSPFUpdate } from '@/app/actions/ds';
 import { getGlobalSettings } from '@/app/actions/pfupdate';
-import { Toast } from '@/lib/toast';
+import { toast } from 'sonner';
 import { Search, RefreshCw, CheckCircle, Save, ChevronLeft, ChevronRight, Hash, User, Loader2, FileCheck } from 'lucide-react';
 
 function DSPFUpdateRow({ row, globalSettings, onSaveSuccess }: any) {
@@ -22,9 +22,9 @@ function DSPFUpdateRow({ row, globalSettings, onSaveSuccess }: any) {
     setIsSaving(false);
 
     if (res.error) {
-      Toast.fire({ title: res.error, icon: 'error' });
+      toast.error(res.error);
     } else {
-      Toast.fire({ title: 'DS PF Updated Successfully', icon: 'success' });
+      toast.success('DS PF Updated Successfully');
       onSaveSuccess(row.ssin);
     }
   };

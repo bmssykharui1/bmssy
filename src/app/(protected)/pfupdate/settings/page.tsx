@@ -2,12 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { getGlobalSettings, updateGlobalSettings } from '@/app/actions/pfupdate';
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
-import { Toast } from '@/lib/toast';
+import { toast } from 'sonner';
 import { Settings, Save, Calendar, Loader2 } from 'lucide-react';
-
-const MySwal = withReactContent(Swal);
 
 export default function PFSettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -31,9 +27,9 @@ export default function PFSettingsPage() {
     setIsSaving(false);
 
     if (res.error) {
-      MySwal.fire({ title: 'Error', text: res.error, icon: 'error' });
+      toast.error(res.error);
     } else {
-      Toast.fire({ title: 'Global settings updated successfully.', icon: 'success' });
+      toast.success('Global settings updated successfully.');
     }
   };
 

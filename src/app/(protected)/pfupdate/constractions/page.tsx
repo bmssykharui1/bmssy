@@ -2,12 +2,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { getPendingPFUpdates, getGlobalSettings, acceptPFUpdate, rejectPFUpdate } from '@/app/actions/pfupdate';
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
-import { Toast } from '@/lib/toast';
+import { toast } from 'sonner';
 import { Search, RefreshCw, CheckCircle, XCircle, X, Save, ChevronLeft, ChevronRight, Hash, Calendar, User, Loader2, FileClock, AlertTriangle } from 'lucide-react';
 
-const MySwal = withReactContent(Swal);
 
 // Component for individual rows to handle inline state (Inputs + Loading)
 function PFTableRow({ row, globalSettings, onAcceptSuccess, openRejectModal }: any) {
@@ -27,9 +24,9 @@ function PFTableRow({ row, globalSettings, onAcceptSuccess, openRejectModal }: a
     setIsAccepting(false);
 
     if (res.error) {
-      MySwal.fire({ title: 'Error', text: res.error, icon: 'error' });
+      toast.error(res.error);
     } else {
-      Toast.fire({ title: 'PF Updated Successfully', icon: 'success' });
+      toast.success('PF Updated Successfully');
       onAcceptSuccess(row.approved_ssin);
     }
   };
@@ -154,9 +151,9 @@ export default function PFUpdateConstructionsPage() {
     setIsRejecting(false);
 
     if (res.error) {
-      MySwal.fire({ title: 'Error', text: res.error, icon: 'error' });
+      toast.error(res.error);
     } else {
-      Toast.fire({ title: 'Beneficiary Rejected', icon: 'success' });
+      toast.success('Beneficiary Rejected');
       setIsRejectModalOpen(false);
       setData(prev => prev.filter(item => item.approved_ssin !== rejectForm.ssin));
     }

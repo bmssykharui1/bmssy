@@ -4,7 +4,7 @@ import { Providers } from './providers';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 
 export const metadata: Metadata = {
-  title: 'DEEPGYA SERVICE | Dashboard',
+  title: 'BMSSY KHARUI I | Dashboard',
   description: 'Modern Node.js Dashboard',
 };
 

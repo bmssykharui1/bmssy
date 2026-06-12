@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { getDSList } from '@/app/actions/ds';
 import { Search, RefreshCw, ChevronLeft, ChevronRight, List, Loader2, Download } from 'lucide-react';
-import { Toast } from '@/lib/toast';
+import { toast } from 'sonner';
 
 export default function DSListPage() {
   const [data, setData] = useState<any[]>([]);
@@ -47,26 +47,26 @@ export default function DSListPage() {
 
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    Toast.fire({ title: `${label} Copied!`, icon: 'success' });
+    toast.success(`${label} Copied!`);
   };
 
   const exportToCSV = () => {
     if (filteredData.length === 0) {
-      Toast.fire({ title: 'No records to export', icon: 'warning' });
+      toast.warning('No records to export');
       return;
     }
-    const headers = ['SSIN', 'Name', 'DS Number', 'Date'];
+    const headers = ['Beneficiary Name', 'SSIN Number', 'DS NO', 'Added On'];
     const csvContent = [
       headers.join(','),
-      ...filteredData.map(row => `${row.ssin},"${row.name}",${row.dsno},${row.created_date}`)
-    ].join('\\n');
+      ...filteredData.map(row => `"${row.name}","${row.ssin}","${row.dsno}","${row.created_date}"`)
+    ].join('\n');
     
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `DuareSorkar_List_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
-    Toast.fire({ title: 'Exported Successfully', icon: 'success' });
+    toast.success('Exported Successfully');
   };
 
   return (

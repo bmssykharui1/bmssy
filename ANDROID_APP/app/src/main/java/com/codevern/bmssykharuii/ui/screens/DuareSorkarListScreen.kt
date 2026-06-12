@@ -1,0 +1,151 @@
+package com.codevern.bmssykharuii.ui.screens
+
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ListAlt
+import androidx.compose.material.icons.filled.Numbers
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.codevern.bmssykharuii.network.SupabaseApi
+import io.github.jan.supabase.postgrest.from
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DuareSorkarListScreen() {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    var dsRecords by remember { mutableStateOf<List<DsRecord>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var searchQuery by remember { mutableStateOf("") }
+
+    val primaryColor = Color(0xFFB36B00)
+
+    fun loadData() {
+        isLoading = true
+        coroutineScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    val res = SupabaseApi.client.from("ds_record").select {
+                        order("id", io.github.jan.supabase.postgrest.query.Order.DESCENDING)
+                        limit(200)
+                    }.decodeList<DsRecord>()
+                    dsRecords = res
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(context, "Failed to load data", Toast.LENGTH_SHORT).show()
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        loadData()
+    }
+
+    val filteredList = dsRecords.filter { item ->
+        (item.name?.contains(searchQuery, ignoreCase = true) == true) ||
+        (item.ssin?.contains(searchQuery, ignoreCase = true) == true) ||
+        (item.dsno?.contains(searchQuery, ignoreCase = true) == true)
+    }
+
+    Column(modifier = Modifier.fillMaxSize().background(Color(0xFFF8FAFC)).padding(16.dp)) {
+        Text(text = "Duare Sorkar / DS List", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = primaryColor, modifier = Modifier.padding(bottom = 16.dp))
+
+        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Search Name, SSIN, or DS NO...") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = primaryColor) },
+                singleLine = true,
+                shape = RoundedCornerShape(100.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryColor, focusedContainerColor = Color.White, unfocusedContainerColor = Color.White)
+            )
+
+            FloatingActionButton(onClick = { loadData() }, containerColor = primaryColor, contentColor = Color.White, shape = CircleShape, modifier = Modifier.size(48.dp)) {
+                if (isLoading) CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                else Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+            }
+        }
+
+        Card(modifier = Modifier.fillMaxSize(), colors = CardDefaults.cardColors(containerColor = Color.White), shape = RoundedCornerShape(16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+            if (isLoading && dsRecords.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = primaryColor)
+                }
+            } else if (filteredList.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("No records found.", color = Color.Gray)
+                }
+            } else {
+                LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(filteredList) { item ->
+                        DSListCard(item = item)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DSListCard(item: DsRecord) {
+    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF7ED)), shape = RoundedCornerShape(12.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(modifier = Modifier.size(40.dp).clip(CircleShape).background(Color(0xFFFFEDD5)), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Default.ListAlt, contentDescription = null, tint = Color(0xFFB36B00), modifier = Modifier.size(20.dp))
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(item.name ?: "Unknown", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0F172A))
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Numbers, contentDescription = null, tint = Color(0xFFB36B00), modifier = Modifier.size(12.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(item.ssin ?: "N/A", fontSize = 13.sp, color = Color(0xFFB36B00), fontFamily = FontFamily.Monospace, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            Divider(color = Color(0xFFFFEDD5))
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Column {
+                    Text("DS NO", fontSize = 11.sp, color = Color(0xFF9A3412), fontWeight = FontWeight.Bold)
+                    Text(item.dsno ?: "-", fontSize = 14.sp, color = Color(0xFF0F172A), fontWeight = FontWeight.Bold)
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text("Entry Date", fontSize = 11.sp, color = Color(0xFF9A3412), fontWeight = FontWeight.Bold)
+                    Text(item.created_at?.take(10) ?: "-", fontSize = 13.sp, color = Color(0xFF0F172A), fontWeight = FontWeight.Medium)
+                }
+            }
+        }
+    }
+}

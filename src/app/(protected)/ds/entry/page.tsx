@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { getDSEntryCandidates, saveDSEntry } from '@/app/actions/ds';
-import { Toast } from '@/lib/toast';
+import { toast } from 'sonner';
 import { Search, RefreshCw, CheckCircle, Save, ChevronLeft, ChevronRight, Hash, User, Loader2, Users, ShieldCheck } from 'lucide-react';
 
 function DSEntryRow({ row, onSaveSuccess }: any) {
@@ -11,7 +11,7 @@ function DSEntryRow({ row, onSaveSuccess }: any) {
 
   const handleSave = async () => {
     if (!dsno.trim()) {
-      Toast.fire({ title: 'Please enter a DS NO', icon: 'warning' });
+      toast.warning('Please enter a DS NO');
       return;
     }
 
@@ -20,9 +20,9 @@ function DSEntryRow({ row, onSaveSuccess }: any) {
     setIsSaving(false);
 
     if (res.error) {
-      Toast.fire({ title: res.error, icon: 'error' });
+      toast.error(res.error);
     } else {
-      Toast.fire({ title: 'DS Entry Saved Successfully', icon: 'success' });
+      toast.success('DS Entry Saved Successfully');
       onSaveSuccess(row.approved_ssin);
     }
   };
