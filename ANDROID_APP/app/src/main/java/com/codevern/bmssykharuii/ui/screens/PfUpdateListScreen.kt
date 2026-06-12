@@ -54,8 +54,6 @@ fun PfUpdateListScreen() {
     // Type Filter (All, 142, 242)
     var typeFilter by remember { mutableStateOf("All") }
 
-    val primaryColor = Color(0xFF0284C7)
-
     fun loadData() {
         isLoading = true
         coroutineScope.launch {
@@ -119,14 +117,14 @@ fun PfUpdateListScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF8FAFC))
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
         Text(
             text = "PF Update Ledger",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = primaryColor,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -140,20 +138,20 @@ fun PfUpdateListScreen() {
                 onValueChange = { searchQuery = it },
                 modifier = Modifier.weight(1f),
                 placeholder = { Text("Search Name, SSIN...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = primaryColor) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                 singleLine = true,
                 shape = RoundedCornerShape(100.dp),
-                colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, 
-                    focusedBorderColor = primaryColor,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, 
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
                 )
             )
 
             FloatingActionButton(
                 onClick = { loadData() },
-                containerColor = primaryColor,
-                contentColor = Color.White,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = CircleShape,
                 modifier = Modifier.size(48.dp)
             ) {
@@ -174,8 +172,8 @@ fun PfUpdateListScreen() {
                     onClick = { typeFilter = type },
                     label = { Text(if (type == "All") "All Types" else if (type == "142") "Others (142)" else "Construction (242)") },
                     colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = primaryColor,
-                        selectedLabelColor = Color.White
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                     )
                 )
             }
@@ -183,17 +181,17 @@ fun PfUpdateListScreen() {
 
         Card(
             modifier = Modifier.fillMaxSize(),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             if (isLoading && mergedData.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = primaryColor)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
             } else if (filteredList.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No records found.", color = Color(0xFF94A3B8))
+                    Text("No records found.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             } else {
                 LazyColumn(
@@ -214,45 +212,45 @@ fun PfUpdateListScreen() {
 fun PfUpdateLedgerCard(item: PfListMergedItem) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F9FF)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
-                    modifier = Modifier.size(40.dp).clip(CircleShape).background(Color(0xFFBAE6FD)),
+                    modifier = Modifier.size(40.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF0284C7), modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
-                    Text(item.beneficiary_name, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0F172A))
+                    Text(item.beneficiary_name, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                     Spacer(modifier = Modifier.height(2.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Numbers, contentDescription = null, tint = Color(0xFF0284C7), modifier = Modifier.size(12.dp))
+                        Icon(Icons.Default.Numbers, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(12.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(item.approved_ssin, fontSize = 13.sp, color = Color(0xFF0284C7), fontFamily = FontFamily.Monospace, fontWeight = FontWeight.SemiBold)
+                        Text(item.approved_ssin, fontSize = 13.sp, color = MaterialTheme.colorScheme.primary, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
             
             Spacer(modifier = Modifier.height(12.dp))
-            Divider(color = Color(0xFFE0F2FE))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column {
                     Text("Period From", fontSize = 11.sp, color = Color(0xFF16A34A), fontWeight = FontWeight.Bold)
-                    Text(item.period_form, fontSize = 13.sp, color = Color(0xFF0F172A), fontWeight = FontWeight.Medium)
+                    Text(item.period_form, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Medium)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Period To", fontSize = 11.sp, color = Color(0xFFDC2626), fontWeight = FontWeight.Bold)
-                    Text(item.period_to, fontSize = 13.sp, color = Color(0xFF0F172A), fontWeight = FontWeight.Medium)
+                    Text(item.period_to, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Medium)
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("Date of 60", fontSize = 11.sp, color = Color(0xFF0284C7), fontWeight = FontWeight.Bold)
-                    Text(item.date_of_60, fontSize = 13.sp, color = Color(0xFF0F172A), fontWeight = FontWeight.Medium)
+                    Text("Date of 60", fontSize = 11.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    Text(item.date_of_60, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Medium)
                 }
             }
         }

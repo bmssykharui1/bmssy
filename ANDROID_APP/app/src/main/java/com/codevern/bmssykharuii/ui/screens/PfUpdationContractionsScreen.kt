@@ -199,7 +199,7 @@ fun PfUpdationContractionsScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF8FAFC))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp)
         ) {
             Text(
@@ -224,7 +224,7 @@ fun PfUpdationContractionsScreen() {
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = primaryColor) },
                     singleLine = true,
                     shape = RoundedCornerShape(100.dp),
-                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryColor, focusedContainerColor = Color.White, unfocusedContainerColor = Color.White)
+                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = primaryColor, focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface)
                 )
 
                 FloatingActionButton(
@@ -245,7 +245,7 @@ fun PfUpdationContractionsScreen() {
             // List
             Card(
                 modifier = Modifier.fillMaxSize(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
@@ -299,7 +299,7 @@ fun PfUpdationContractionsScreen() {
                 Card(
                     modifier = Modifier.padding(24.dp).fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(modifier = Modifier.padding(24.dp)) {
                         Text("Reject Beneficiary", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFFB3261E))
@@ -362,16 +362,16 @@ fun PfPendingCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
-                    modifier = Modifier.size(40.dp).clip(CircleShape).background(Color(0xFFE8DEF8)),
+                    modifier = Modifier.size(40.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(item.beneficiary_name?.take(1)?.uppercase() ?: "", color = Color(0xFF6750A4), fontWeight = FontWeight.Bold)
+                    Text(item.beneficiary_name?.take(1)?.uppercase() ?: "", color = MaterialTheme.colorScheme.onPrimaryContainer, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
@@ -390,7 +390,7 @@ fun PfPendingCard(
                     label = { Text("Period From") },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = Color(0xFF6750A4))
+                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = Color(0xFF6750A4))
                 )
                 OutlinedTextField(
                     value = pTo,
@@ -398,7 +398,7 @@ fun PfPendingCard(
                     label = { Text("Period To") },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = Color(0xFF6750A4))
+                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = Color(0xFF6750A4))
                 )
             }
 

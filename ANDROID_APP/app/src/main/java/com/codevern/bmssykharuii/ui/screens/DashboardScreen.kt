@@ -25,6 +25,21 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import com.codevern.bmssykharuii.data.SessionManager
 import com.codevern.bmssykharuii.data.dataStore
+import com.codevern.bmssykharuii.BuildConfig
+import com.codevern.bmssykharuii.network.SupabaseApi
+import io.github.jan.supabase.postgrest.from
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import com.codevern.bmssykharuii.utils.UpdateManager
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class AppUpdate(
+    val id: Int? = null,
+    val latest_version_code: Int? = null,
+    val apk_url: String? = null,
+    val release_notes: String? = null
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,41 +61,102 @@ fun DashboardScreen(agentId: String) {
     // Accordion state
     var expandedMenu by remember { mutableStateOf<String?>(null) }
 
+    var updateSettings by remember { mutableStateOf<AppUpdate?>(null) }
+    var showUpdateModal by remember { mutableStateOf(false) }
+    var isCheckingUpdate by remember { mutableStateOf(false) }
+
+    fun checkForUpdates(isManualCheck: Boolean) {
+        if (isCheckingUpdate && isManualCheck) return
+        isCheckingUpdate = true
+        coroutineScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    val updatesList = SupabaseApi.client.from("app_updates").select {
+                        order("id", io.github.jan.supabase.postgrest.query.Order.DESCENDING)
+                        limit(1)
+                    }.decodeList<AppUpdate>()
+                    val update = updatesList.firstOrNull()
+                    withContext(Dispatchers.Main) {
+                        if (update != null && update.latest_version_code != null) {
+                            if (update.latest_version_code > BuildConfig.VERSION_CODE && !update.apk_url.isNullOrBlank()) {
+                                updateSettings = update
+                                showUpdateModal = true
+                            } else if (isManualCheck) {
+                                android.widget.Toast.makeText(context, "You are on the latest version", android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                        } else if (isManualCheck) {
+                            android.widget.Toast.makeText(context, "You are on the latest version", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                if (isManualCheck) {
+                    withContext(Dispatchers.Main) {
+                        android.widget.Toast.makeText(context, "Failed: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
+                    }
+                }
+            } finally {
+                isCheckingUpdate = false
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        checkForUpdates(false)
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = Color.White,
+                drawerContainerColor = MaterialTheme.colorScheme.surface,
                 modifier = Modifier.width(280.dp)
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     // Sidebar Header (Blue Background)
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color(0xFF0284C7))
+                            .background(MaterialTheme.colorScheme.primaryContainer)
                             .padding(horizontal = 24.dp, vertical = 32.dp)
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                             Box(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(Color.White),
+                                    .background(MaterialTheme.colorScheme.surface),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(Icons.Default.Shield, contentDescription = null, tint = Color(0xFF0284C7), modifier = Modifier.size(28.dp))
+                                Icon(Icons.Default.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(28.dp))
                             }
                             Spacer(modifier = Modifier.width(16.dp))
-                            Text(text = "BMSSY KHARUI I", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(text = "BMSSY KHARUI I", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                                Text(text = "Version ${BuildConfig.VERSION_NAME}", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f))
+                            }
+                            IconButton(onClick = { checkForUpdates(true) }) {
+                                if (isCheckingUpdate) {
+                                    CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                                } else {
+                                    Icon(Icons.Default.Refresh, contentDescription = "Check for updates", tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(20.dp))
+                                }
+                            }
                         }
                     }
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
 
-                    // Dashboard
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Dashboard
                     DrawerMenuItem(icon = Icons.Default.Home, label = "Dashboard", iconColor = Color(0xFF0B57D0), isSelected = selectedItem == "Dashboard") {
                         selectedItem = "Dashboard"
                         coroutineScope.launch { drawerState.close() }
@@ -161,12 +237,23 @@ fun DashboardScreen(agentId: String) {
                     }
 
                     Spacer(modifier = Modifier.height(32.dp))
-                    HorizontalDivider(color = Color(0xFFF1F5F9))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                     
-                    // Agent Footer Info
-                    Column(modifier = Modifier.padding(24.dp)) {
-                        Text(text = actualAgentName, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF0F172A))
-                        Text(text = "ID: $agentId | $actualAgentArea", fontSize = 14.sp, color = Color(0xFF64748B))
+                    // Settings
+                    DrawerMenuItem(icon = Icons.Default.Settings, label = "Settings", iconColor = Color(0xFF64748B), isSelected = selectedItem == "Settings") {
+                        selectedItem = "Settings"
+                        coroutineScope.launch { drawerState.close() }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                } // End of scrollable menu column
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+
+                // Agent Footer Info
+                Column(modifier = Modifier.padding(24.dp)) {
+                        Text(text = actualAgentName, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
+                        Text(text = "ID: $agentId | $actualAgentArea", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         
                         Spacer(modifier = Modifier.height(16.dp))
                         
@@ -198,13 +285,13 @@ fun DashboardScreen(agentId: String) {
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color(0xFF0284C7),
-                        titleContentColor = Color.White,
-                        navigationIconContentColor = Color.White
+                        containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.85f),
+                        titleContentColor = MaterialTheme.colorScheme.onBackground,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onBackground
                     )
                 )
             },
-            containerColor = Color(0xFFF8FAFC)
+            containerColor = MaterialTheme.colorScheme.background
         ) { paddingValues ->
             Box(
                 modifier = Modifier
@@ -231,6 +318,7 @@ fun DashboardScreen(agentId: String) {
 
                     "Form 4 - Add New" -> Form4AddNewScreen()
                     "Form 4 - Download PDF" -> Form4DownloadPdfScreen()
+                    "Settings" -> SettingsScreen()
                     else -> {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
@@ -253,6 +341,62 @@ fun DashboardScreen(agentId: String) {
             }
         }
     }
+    if (showUpdateModal && updateSettings != null) {
+        Box(
+            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Card(
+                modifier = Modifier.padding(24.dp).fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.SystemUpdateAlt,
+                        contentDescription = "Update Available",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(64.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "New Update Available!",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = updateSettings?.release_notes ?: "A new version of BMSSY KHARUI I is ready to install. Please update to enjoy the latest features and bug fixes.",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Button(
+                        onClick = {
+                            showUpdateModal = false
+                            updateSettings?.apk_url?.let {
+                                UpdateManager(context).downloadAndInstallUpdate(it)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        shape = RoundedCornerShape(100.dp)
+                    ) {
+                        Text("Download & Install", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    TextButton(onClick = { showUpdateModal = false }) {
+                        Text("Later", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -264,7 +408,7 @@ fun DrawerMenuItem(
     badge: String? = null,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected) Color(0xFFF1F5F9) else Color.Transparent
+    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else Color.Transparent
 
     Row(
         modifier = Modifier
@@ -278,7 +422,7 @@ fun DrawerMenuItem(
     ) {
         Icon(imageVector = icon, contentDescription = label, tint = iconColor, modifier = Modifier.size(22.dp))
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text = label, color = Color(0xFF334155), fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium, fontSize = 15.sp, modifier = Modifier.weight(1f))
+        Text(text = label, color = MaterialTheme.colorScheme.onSurface, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium, fontSize = 15.sp, modifier = Modifier.weight(1f))
         
         if (badge != null) {
             Box(
@@ -309,7 +453,7 @@ fun DrawerMenuDropdown(
     ) {
         Icon(imageVector = icon, contentDescription = label, tint = iconColor, modifier = Modifier.size(22.dp))
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text = label, color = Color(0xFF334155), fontWeight = FontWeight.Medium, fontSize = 15.sp, modifier = Modifier.weight(1f))
+        Text(text = label, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Medium, fontSize = 15.sp, modifier = Modifier.weight(1f))
         Icon(
             imageVector = if (isOpen) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowRight, 
             contentDescription = null, 
@@ -325,8 +469,8 @@ fun DrawerSubMenuItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected) Color(0xFFF1F5F9) else Color.Transparent
-    val textColor = if (isSelected) Color(0xFF0F172A) else Color(0xFF64748B)
+    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else Color.Transparent
+    val textColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
     
     Row(
         modifier = Modifier

@@ -138,7 +138,7 @@ fun DuareSorkarPfUpdateScreen() {
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(Color(0xFFF8FAFC)).padding(16.dp)) {
+    Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(16.dp)) {
         Text(text = "Duare Sorkar / PF Update", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = primaryColor, modifier = Modifier.padding(bottom = 16.dp))
 
         Row(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -150,7 +150,7 @@ fun DuareSorkarPfUpdateScreen() {
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = primaryColor) },
                 singleLine = true,
                 shape = RoundedCornerShape(100.dp),
-                colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryColor, focusedContainerColor = Color.White, unfocusedContainerColor = Color.White)
+                colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = primaryColor, focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface)
             )
 
             FloatingActionButton(onClick = { loadData() }, containerColor = primaryColor, contentColor = Color.White, shape = CircleShape, modifier = Modifier.size(48.dp)) {
@@ -159,7 +159,7 @@ fun DuareSorkarPfUpdateScreen() {
             }
         }
 
-        Card(modifier = Modifier.fillMaxSize(), colors = CardDefaults.cardColors(containerColor = Color.White), shape = RoundedCornerShape(16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+        Card(modifier = Modifier.fillMaxSize(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), shape = RoundedCornerShape(16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
             if (isLoading && pendingData.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = primaryColor)
@@ -201,11 +201,11 @@ fun DSPfPendingCard(
     var pTo by remember { mutableStateOf(globalTo) }
     var isSaving by remember { mutableStateOf(false) }
 
-    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF7ED)), shape = RoundedCornerShape(12.dp)) {
+    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), shape = RoundedCornerShape(12.dp)) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.size(40.dp).clip(CircleShape).background(Color(0xFFFFEDD5)), contentAlignment = Alignment.Center) {
-                    Text(item.name?.take(1)?.uppercase() ?: "", color = Color(0xFFB36B00), fontWeight = FontWeight.Bold)
+                Box(modifier = Modifier.size(40.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer), contentAlignment = Alignment.Center) {
+                    Text(item.name?.take(1)?.uppercase() ?: "", color = MaterialTheme.colorScheme.onPrimaryContainer, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
@@ -228,7 +228,7 @@ fun DSPfPendingCard(
                     label = { Text("Period From") },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = Color(0xFFB36B00))
+                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = Color(0xFFB36B00))
                 )
                 OutlinedTextField(
                     value = pTo,
@@ -236,7 +236,7 @@ fun DSPfPendingCard(
                     label = { Text("Period To") },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = Color(0xFFB36B00))
+                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = Color(0xFFB36B00))
                 )
             }
 

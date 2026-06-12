@@ -166,7 +166,7 @@ fun DashboardOverviewScreen(agentId: String) {
             text = "SSIN Statistics",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF0F172A),
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
@@ -204,7 +204,7 @@ fun SimpleCard(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(4.dp, RoundedCornerShape(12.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -227,7 +227,7 @@ fun SimpleCard(
                     text = value?.toString() ?: "...",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF0F172A)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

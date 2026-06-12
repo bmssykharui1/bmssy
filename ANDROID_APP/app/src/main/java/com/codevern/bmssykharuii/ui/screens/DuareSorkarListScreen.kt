@@ -38,9 +38,7 @@ fun DuareSorkarListScreen() {
     var dsRecords by remember { mutableStateOf<List<DsRecord>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var searchQuery by remember { mutableStateOf("") }
-
-    val primaryColor = Color(0xFFB36B00)
-
+    
     fun loadData() {
         isLoading = true
         coroutineScope.launch {
@@ -71,8 +69,8 @@ fun DuareSorkarListScreen() {
         (item.dsno?.contains(searchQuery, ignoreCase = true) == true)
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(Color(0xFFF8FAFC)).padding(16.dp)) {
-        Text(text = "Duare Sorkar / DS List", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = primaryColor, modifier = Modifier.padding(bottom = 16.dp))
+    Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(16.dp)) {
+        Text(text = "Duare Sorkar / DS List", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(bottom = 16.dp))
 
         Row(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             OutlinedTextField(
@@ -80,26 +78,26 @@ fun DuareSorkarListScreen() {
                 onValueChange = { searchQuery = it },
                 modifier = Modifier.weight(1f),
                 placeholder = { Text("Search Name, SSIN, or DS NO...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = primaryColor) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                 singleLine = true,
                 shape = RoundedCornerShape(100.dp),
-                colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryColor, focusedContainerColor = Color.White, unfocusedContainerColor = Color.White)
+                colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = MaterialTheme.colorScheme.primary, focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface)
             )
 
-            FloatingActionButton(onClick = { loadData() }, containerColor = primaryColor, contentColor = Color.White, shape = CircleShape, modifier = Modifier.size(48.dp)) {
-                if (isLoading) CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+            FloatingActionButton(onClick = { loadData() }, containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary, shape = CircleShape, modifier = Modifier.size(48.dp)) {
+                if (isLoading) CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                 else Icon(Icons.Default.Refresh, contentDescription = "Refresh")
             }
         }
 
-        Card(modifier = Modifier.fillMaxSize(), colors = CardDefaults.cardColors(containerColor = Color.White), shape = RoundedCornerShape(16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+        Card(modifier = Modifier.fillMaxSize(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), shape = RoundedCornerShape(16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
             if (isLoading && dsRecords.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = primaryColor)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
             } else if (filteredList.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No records found.", color = Color.Gray)
+                    Text("No records found.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             } else {
                 LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -114,36 +112,36 @@ fun DuareSorkarListScreen() {
 
 @Composable
 fun DSListCard(item: DsRecord) {
-    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF7ED)), shape = RoundedCornerShape(12.dp)) {
+    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f)), shape = RoundedCornerShape(12.dp)) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.size(40.dp).clip(CircleShape).background(Color(0xFFFFEDD5)), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Default.ListAlt, contentDescription = null, tint = Color(0xFFB36B00), modifier = Modifier.size(20.dp))
+                Box(modifier = Modifier.size(40.dp).clip(CircleShape).background(MaterialTheme.colorScheme.tertiaryContainer), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Default.ListAlt, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(20.dp))
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
-                    Text(item.name ?: "Unknown", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0F172A))
+                    Text(item.name ?: "Unknown", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                     Spacer(modifier = Modifier.height(2.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Numbers, contentDescription = null, tint = Color(0xFFB36B00), modifier = Modifier.size(12.dp))
+                        Icon(Icons.Default.Numbers, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(12.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(item.ssin ?: "N/A", fontSize = 13.sp, color = Color(0xFFB36B00), fontFamily = FontFamily.Monospace, fontWeight = FontWeight.SemiBold)
+                        Text(item.ssin ?: "N/A", fontSize = 13.sp, color = MaterialTheme.colorScheme.tertiary, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
             
             Spacer(modifier = Modifier.height(12.dp))
-            Divider(color = Color(0xFFFFEDD5))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column {
-                    Text("DS NO", fontSize = 11.sp, color = Color(0xFF9A3412), fontWeight = FontWeight.Bold)
-                    Text(item.dsno ?: "-", fontSize = 14.sp, color = Color(0xFF0F172A), fontWeight = FontWeight.Bold)
+                    Text("DS NO", fontSize = 11.sp, color = MaterialTheme.colorScheme.tertiary, fontWeight = FontWeight.Bold)
+                    Text(item.dsno ?: "-", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("Entry Date", fontSize = 11.sp, color = Color(0xFF9A3412), fontWeight = FontWeight.Bold)
-                    Text(item.created_at?.take(10) ?: "-", fontSize = 13.sp, color = Color(0xFF0F172A), fontWeight = FontWeight.Medium)
+                    Text("Entry Date", fontSize = 11.sp, color = MaterialTheme.colorScheme.tertiary, fontWeight = FontWeight.Bold)
+                    Text(item.created_at?.take(10) ?: "-", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Medium)
                 }
             }
         }

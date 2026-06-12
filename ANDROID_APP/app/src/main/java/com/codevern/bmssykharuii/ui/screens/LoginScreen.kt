@@ -104,14 +104,34 @@ fun LoginScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(elevation = 24.dp, shape = RoundedCornerShape(24.dp), spotColor = Color(0xFF0284C7).copy(alpha = 0.1f)),
+                    .padding(top = 16.dp),
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                // Glass border effect
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.linearGradient(
+                                listOf(
+                                    Color.White.copy(alpha = 0.4f),
+                                    Color.Transparent,
+                                    Color.White.copy(alpha = 0.1f)
+                                )
+                            )
+                        )
+                        .padding(1.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(MaterialTheme.colorScheme.surface)
                 ) {
+                    Column(
+                        modifier = Modifier.padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                     Text(
                         text = "Sign In",
                         fontSize = 24.sp,
@@ -151,13 +171,15 @@ fun LoginScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, 
-                            focusedBorderColor = primaryBlue,
-                            unfocusedBorderColor = Color(0xFFE2E8F0),
-                            focusedLabelColor = primaryBlue,
-                            unfocusedLabelColor = Color(0xFF94A3B8),
-                            focusedContainerColor = Color(0xFFF8FAFC),
-                            unfocusedContainerColor = Color(0xFFF8FAFC)
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface, 
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface, 
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                         )
                     )
 
@@ -191,22 +213,23 @@ fun LoginScreen(
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = primaryBlue),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         enabled = !isLoading && agentId.isNotBlank()
                     ) {
                         if (isLoading) {
-                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp))
                         } else {
                             Text(
                                 text = "CONTINUE", 
                                 fontSize = 16.sp, 
                                 fontWeight = FontWeight.Bold, 
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 letterSpacing = 1.sp
                             )
                         }
                     }
                 }
+            }
             }
         }
     }

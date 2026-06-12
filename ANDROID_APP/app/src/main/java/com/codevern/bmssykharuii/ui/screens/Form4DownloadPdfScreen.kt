@@ -167,13 +167,13 @@ fun Form4DownloadPdfScreen() {
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().background(Color(0xFFF8FAFC)).padding(16.dp),
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Card(
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
             modifier = Modifier.padding(16.dp)
         ) {
@@ -198,7 +198,7 @@ fun Form4DownloadPdfScreen() {
                 Text(
                     text = "Download a formatted PDF document containing all recent Form 4 records.",
                     fontSize = 16.sp,
-                    color = Color(0xFF64748B),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(32.dp))

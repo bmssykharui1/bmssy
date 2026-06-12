@@ -93,7 +93,7 @@ fun PfUpdationSettingsScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF8FAFC))
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
@@ -109,7 +109,7 @@ fun PfUpdationSettingsScreen() {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
@@ -118,7 +118,7 @@ fun PfUpdationSettingsScreen() {
                 Text(
                     "These dates are used as defaults for all PF Updation processes. Ensure they are correct before starting batch updates.",
                     fontSize = 13.sp,
-                    color = Color(0xFF64748B)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -132,7 +132,7 @@ fun PfUpdationSettingsScreen() {
                         label = { Text("Period From (YYYY-MM-DD)") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryColor, focusedLabelColor = primaryColor)
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = primaryColor, focusedLabelColor = primaryColor)
                     )
                     
                     Spacer(modifier = Modifier.height(16.dp))
@@ -143,7 +143,7 @@ fun PfUpdationSettingsScreen() {
                         label = { Text("Period To (YYYY-MM-DD)") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryColor, focusedLabelColor = primaryColor)
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = primaryColor, focusedLabelColor = primaryColor)
                     )
 
                     Spacer(modifier = Modifier.height(32.dp))

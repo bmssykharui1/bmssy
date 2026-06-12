@@ -70,7 +70,7 @@ fun Form4AddNewScreen() {
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
@@ -93,7 +93,7 @@ fun Form4AddNewScreen() {
                     label = { Text("Registration No.") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryTeal, focusedLabelColor = primaryTeal)
+                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = primaryTeal, focusedLabelColor = primaryTeal)
                 )
 
                 // Beneficiary Name
@@ -104,7 +104,7 @@ fun Form4AddNewScreen() {
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
-                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryTeal, focusedLabelColor = primaryTeal)
+                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = primaryTeal, focusedLabelColor = primaryTeal)
                 )
 
                 // Book No and Receipt No Row
@@ -116,7 +116,7 @@ fun Form4AddNewScreen() {
                         modifier = Modifier.weight(1f),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryTeal, focusedLabelColor = primaryTeal)
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = primaryTeal, focusedLabelColor = primaryTeal)
                     )
                     OutlinedTextField(
                         value = receiptNo,
@@ -125,11 +125,11 @@ fun Form4AddNewScreen() {
                         modifier = Modifier.weight(1f),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryTeal, focusedLabelColor = primaryTeal)
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = primaryTeal, focusedLabelColor = primaryTeal)
                     )
                 }
 
-                Text("For the Period (YYYY-MM-DD)", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFF64748B))
+                Text("For the Period (YYYY-MM-DD)", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     DatePickerField(
                         label = "From",
@@ -138,7 +138,7 @@ fun Form4AddNewScreen() {
                         modifier = Modifier.weight(1f),
                         primaryColor = primaryTeal
                     )
-                    Text("TO", fontWeight = FontWeight.Bold, color = Color(0xFF64748B))
+                    Text("TO", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     DatePickerField(
                         label = "To",
                         date = forMonthTo,
@@ -164,7 +164,7 @@ fun Form4AddNewScreen() {
                         modifier = Modifier.weight(1f),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryTeal, focusedLabelColor = primaryTeal)
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = primaryTeal, focusedLabelColor = primaryTeal)
                     )
                 }
 
@@ -289,7 +289,7 @@ fun DatePickerField(
                 Icon(Icons.Default.CalendarToday, contentDescription = "Select Date", tint = primaryColor)
             }
         },
-        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, 
+        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, 
             focusedBorderColor = primaryColor, 
             focusedLabelColor = primaryColor
         ),

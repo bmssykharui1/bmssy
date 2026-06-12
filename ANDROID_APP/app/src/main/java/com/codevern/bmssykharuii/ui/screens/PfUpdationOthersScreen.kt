@@ -170,7 +170,7 @@ fun PfUpdationOthersScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF8FAFC))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp)
         ) {
             Text(
@@ -194,7 +194,7 @@ fun PfUpdationOthersScreen() {
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = primaryColor) },
                     singleLine = true,
                     shape = RoundedCornerShape(100.dp),
-                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryColor, focusedContainerColor = Color.White, unfocusedContainerColor = Color.White)
+                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = primaryColor, focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface)
                 )
 
                 FloatingActionButton(
@@ -214,7 +214,7 @@ fun PfUpdationOthersScreen() {
 
             Card(
                 modifier = Modifier.fillMaxSize(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
@@ -267,7 +267,7 @@ fun PfUpdationOthersScreen() {
                 Card(
                     modifier = Modifier.padding(24.dp).fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(modifier = Modifier.padding(24.dp)) {
                         Text("Reject Beneficiary", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFFB3261E))

@@ -51,8 +51,6 @@ fun NewDataListScreen() {
     var isLoading by remember { mutableStateOf(true) }
     var searchQuery by remember { mutableStateOf("") }
 
-    val primaryTeal = Color(0xFF0D9488) // Teal for New Data
-
     var isAdvancedSearch by remember { mutableStateOf(false) }
     var advSsin by remember { mutableStateOf("") }
     var advName by remember { mutableStateOf("") }
@@ -100,14 +98,14 @@ fun NewDataListScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF8FAFC))
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
         Text(
             text = "Newly Added Records",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = primaryTeal,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
@@ -118,15 +116,15 @@ fun NewDataListScreen() {
             Checkbox(
                 checked = isAdvancedSearch,
                 onCheckedChange = { isAdvancedSearch = it },
-                colors = CheckboxDefaults.colors(checkedColor = primaryTeal)
+                colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
             )
-            Text("Advanced Search", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color(0xFF334155))
+            Text("Advanced Search", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
         }
 
         if (isAdvancedSearch) {
             Card(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(12.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
@@ -137,7 +135,7 @@ fun NewDataListScreen() {
                         label = { Text("SSIN Number") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryTeal, focusedLabelColor = primaryTeal)
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = MaterialTheme.colorScheme.primary, focusedLabelColor = MaterialTheme.colorScheme.primary)
                     )
                     OutlinedTextField(
                         value = advName,
@@ -145,7 +143,7 @@ fun NewDataListScreen() {
                         label = { Text("Name") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryTeal, focusedLabelColor = primaryTeal)
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = MaterialTheme.colorScheme.primary, focusedLabelColor = MaterialTheme.colorScheme.primary)
                     )
                     OutlinedTextField(
                         value = advPhone,
@@ -153,12 +151,12 @@ fun NewDataListScreen() {
                         label = { Text("Phone No") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryTeal, focusedLabelColor = primaryTeal)
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = MaterialTheme.colorScheme.primary, focusedLabelColor = MaterialTheme.colorScheme.primary)
                     )
                     Button(
                         onClick = { loadData() },
                         modifier = Modifier.fillMaxWidth().height(48.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = primaryTeal),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -180,21 +178,21 @@ fun NewDataListScreen() {
                     onValueChange = { searchQuery = it },
                     modifier = Modifier.weight(1f),
                     placeholder = { Text("Search...") },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = primaryTeal) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                     singleLine = true,
                     shape = RoundedCornerShape(100.dp),
-                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, 
-                        focusedBorderColor = primaryTeal,
-                        unfocusedBorderColor = Color(0xFFE2E8F0),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
+                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, 
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
                     )
                 )
 
                 FloatingActionButton(
                     onClick = { loadData() },
-                    containerColor = primaryTeal,
-                    contentColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = CircleShape,
                     modifier = Modifier.size(48.dp)
                 ) {
@@ -209,17 +207,17 @@ fun NewDataListScreen() {
 
         Card(
             modifier = Modifier.fillMaxSize(),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             if (isLoading && beneficiaries.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = primaryTeal)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
             } else if (filteredList.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No records found.", color = Color(0xFF94A3B8))
+                    Text("No records found.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             } else {
                 LazyColumn(
@@ -240,7 +238,7 @@ fun NewDataListScreen() {
 fun NewBeneficiaryCard(item: NewBeneficiaryItem) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0FDFA)), // Teal Tint
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -249,10 +247,10 @@ fun NewBeneficiaryCard(item: NewBeneficiaryItem) {
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFCCFBF1)),
+                        .background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Default.FiberNew, contentDescription = null, tint = Color(0xFF0D9488), modifier = Modifier.size(24.dp))
+                    Icon(Icons.Default.FiberNew, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(24.dp))
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
@@ -260,16 +258,16 @@ fun NewBeneficiaryCard(item: NewBeneficiaryItem) {
                         text = item.beneficiary_name ?: "Unknown",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF0F172A)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Numbers, contentDescription = null, tint = Color(0xFF0D9488), modifier = Modifier.size(12.dp))
+                        Icon(Icons.Default.Numbers, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(12.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = item.approved_ssin ?: "N/A",
                             fontSize = 13.sp,
-                            color = Color(0xFF0D9488),
+                            color = MaterialTheme.colorScheme.primary,
                             fontFamily = FontFamily.Monospace,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -280,28 +278,28 @@ fun NewBeneficiaryCard(item: NewBeneficiaryItem) {
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(4.dp))
-                        .background(Color(0xFF0D9488))
+                        .background(MaterialTheme.colorScheme.primary)
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
-                    Text("NEW", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text("NEW", color = MaterialTheme.colorScheme.onPrimary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 }
             }
             
             Spacer(modifier = Modifier.height(12.dp))
-            Divider(color = Color(0xFF99F6E4))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column {
-                    Text("Date of 60", fontSize = 11.sp, color = Color(0xFF0F766E), fontWeight = FontWeight.Bold)
-                    Text(item.date_of_attaining_60 ?: "-", fontSize = 13.sp, color = Color(0xFF0F172A))
+                    Text("Date of 60", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
+                    Text(item.date_of_attaining_60 ?: "-", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface)
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("Phone", fontSize = 11.sp, color = Color(0xFF0F766E), fontWeight = FontWeight.Bold)
+                    Text("Phone", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Call, contentDescription = null, modifier = Modifier.size(10.dp), tint = Color(0xFF0F766E))
+                        Icon(Icons.Default.Call, contentDescription = null, modifier = Modifier.size(10.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(item.phone_no ?: "-", fontSize = 13.sp, color = Color(0xFF0F172A))
+                        Text(item.phone_no ?: "-", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             }

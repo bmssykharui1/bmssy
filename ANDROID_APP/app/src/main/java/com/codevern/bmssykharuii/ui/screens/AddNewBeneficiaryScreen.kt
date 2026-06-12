@@ -134,23 +134,16 @@ fun AddNewBeneficiaryScreen() {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 24.dp)
-        ) {
-            Icon(Icons.Default.AddCircle, contentDescription = null, tint = primaryBlue, modifier = Modifier.size(32.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Add New SSIN", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = primaryBlue)
-        }
+
 
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
-                Text("SSIN PORTAL DATA ENTRY", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = primaryBlue)
+                Text("SSIN PORTAL DATA ENTRY", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
@@ -163,7 +156,7 @@ fun AddNewBeneficiaryScreen() {
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     readOnly = showNewDataForm || isChecking || isSubmitting,
-                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryBlue, focusedLabelColor = primaryBlue)
+                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = primaryBlue, focusedLabelColor = primaryBlue)
                 )
 
                 AnimatedVisibility(
@@ -179,7 +172,7 @@ fun AddNewBeneficiaryScreen() {
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
-                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryBlue, focusedLabelColor = primaryBlue)
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = primaryBlue, focusedLabelColor = primaryBlue)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         DatePickerField(
@@ -198,7 +191,7 @@ fun AddNewBeneficiaryScreen() {
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black, focusedBorderColor = primaryBlue, focusedLabelColor = primaryBlue)
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = primaryBlue, focusedLabelColor = primaryBlue)
                         )
                     }
                 }
