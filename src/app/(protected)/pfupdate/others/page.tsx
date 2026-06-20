@@ -97,7 +97,7 @@ export default function PFUpdateOthersPage() {
   // Modal State - Reject
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
-  const [rejectForm, setRejectForm] = useState({ ssin: '', name: '', reason: '' });
+  const [rejectForm, setRejectForm] = useState({ ssin: '', name: '', reason: '', otherReason: '' });
 
   const loadData = async () => {
     setLoading(true);
@@ -137,7 +137,8 @@ export default function PFUpdateOthersPage() {
     setRejectForm({
       ssin: row.approved_ssin,
       name: row.beneficiary_name,
-      reason: ''
+      reason: '',
+      otherReason: ''
     });
     setIsRejectModalOpen(true);
   };
@@ -146,7 +147,8 @@ export default function PFUpdateOthersPage() {
     e.preventDefault();
     setIsRejecting(true);
     
-    const res = await rejectPFUpdate(rejectForm.ssin, rejectForm.name, rejectForm.reason);
+    const finalReason = rejectForm.reason === 'Other' ? rejectForm.otherReason : rejectForm.reason;
+    const res = await rejectPFUpdate(rejectForm.ssin, rejectForm.name, finalReason);
     setIsRejecting(false);
 
     if (res.error) {
@@ -325,11 +327,24 @@ export default function PFUpdateOthersPage() {
                     <option value="Already Exists in System">Already Exists in System</option>
                     <option value="Other">Other</option>
                   </select>
+                  
+                  {rejectForm.reason === 'Other' && (
+                    <div style={{ marginTop: '12px', animation: 'fadeIn 0.3s' }}>
+                      <input 
+                        type="text" 
+                        required 
+                        placeholder="Please specify the reason..." 
+                        value={rejectForm.otherReason}
+                        onChange={(e) => setRejectForm({...rejectForm, otherReason: e.target.value})}
+                        style={{ padding: '10px 14px', width: '100%', background: 'rgba(0,0,0,0.02)', color: 'var(--text-main)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '13px', outline: 'none' }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
               <div style={{ padding: '16px 24px', background: 'var(--background)', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                 <button type="button" onClick={() => setIsRejectModalOpen(false)} style={{ background: 'none', border: 'none', padding: '8px 16px', fontWeight: 600, color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '100px', fontSize: '13px' }}>Cancel</button>
-                <button type="submit" disabled={isRejecting || !rejectForm.reason} style={{ padding: '8px 20px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--error)', color: '#fff', border: 'none', fontWeight: 600, cursor: (isRejecting || !rejectForm.reason) ? 'not-allowed' : 'pointer', opacity: (isRejecting || !rejectForm.reason) ? 0.7 : 1, fontSize: '13px', boxShadow: '0 4px 12px rgba(179, 38, 30, 0.2)' }}>
+                <button type="submit" disabled={isRejecting || !rejectForm.reason || (rejectForm.reason === 'Other' && !rejectForm.otherReason.trim())} style={{ padding: '8px 20px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--error)', color: '#fff', border: 'none', fontWeight: 600, cursor: (isRejecting || !rejectForm.reason || (rejectForm.reason === 'Other' && !rejectForm.otherReason.trim())) ? 'not-allowed' : 'pointer', opacity: (isRejecting || !rejectForm.reason || (rejectForm.reason === 'Other' && !rejectForm.otherReason.trim())) ? 0.7 : 1, fontSize: '13px', boxShadow: '0 4px 12px rgba(179, 38, 30, 0.2)' }}>
                   {isRejecting ? <><Loader2 size={16} className="spinner" /> Rejecting...</> : <><XCircle size={16} /> Confirm Reject</>}
                 </button>
               </div>

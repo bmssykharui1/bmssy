@@ -30,8 +30,16 @@ export default function NewDataListPage() {
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
     const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    setDateFrom(firstDay.toISOString().split('T')[0]);
-    setDateTo(lastDay.toISOString().split('T')[0]);
+    
+    const formatLocal = (date: Date) => {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    };
+    
+    setDateFrom(formatLocal(firstDay));
+    setDateTo(formatLocal(lastDay));
   }, []);
 
   const filteredData = useMemo(() => {

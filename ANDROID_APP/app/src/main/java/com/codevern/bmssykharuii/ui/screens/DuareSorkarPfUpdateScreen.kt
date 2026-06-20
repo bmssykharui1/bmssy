@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -53,10 +54,30 @@ fun DuareSorkarPfUpdateScreen() {
     var globalSettings by remember { mutableStateOf<GlobalSettings?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var searchQuery by remember { mutableStateOf("") }
+    var offset by remember { mutableStateOf(0) }
+
+    val listState = rememberLazyListState()
+
+    val isAtBottom by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+            if (layoutInfo.totalItemsCount == 0) {
+                false
+            } else {
+                val lastVisibleItem = visibleItemsInfo.last()
+                lastVisibleItem.index + 1 == layoutInfo.totalItemsCount
+            }
+        }
+    }
 
     val primaryColor = Color(0xFFB36B00)
 
-    fun loadData() {
+    fun loadData(isLoadMore: Boolean = false) {
+        if (!isLoadMore) {
+            offset = 0
+            pendingData = emptyList()
+        }
         isLoading = true
         coroutineScope.launch {
             try {
@@ -67,7 +88,7 @@ fun DuareSorkarPfUpdateScreen() {
 
                     val dsRecords = SupabaseApi.client.from("ds_record").select {
                         order("id", io.github.jan.supabase.postgrest.query.Order.DESCENDING)
-                        limit(200)
+                        range(offset.toLong(), offset.toLong() + 199L)
                     }.decodeList<DsRecord>()
 
                     if (dsRecords.isNotEmpty()) {
@@ -82,9 +103,13 @@ fun DuareSorkarPfUpdateScreen() {
                             val latestPf = pfUpdates.filter { it.approved_ssin == d.ssin }.maxByOrNull { it.id ?: 0 }
                             latestPf?.period_to != globalPeriodTo
                         }
-                        pendingData = pending
+                        if (isLoadMore) {
+                            pendingData = pendingData + pending
+                        } else {
+                            pendingData = pending
+                        }
                     } else {
-                        pendingData = emptyList()
+                        if (!isLoadMore) pendingData = emptyList()
                     }
                 }
             } catch (e: Exception) {
@@ -98,6 +123,13 @@ fun DuareSorkarPfUpdateScreen() {
 
     LaunchedEffect(Unit) {
         loadData()
+    }
+
+    LaunchedEffect(isAtBottom) {
+        if (isAtBottom && !isLoading && pendingData.isNotEmpty()) {
+            offset += 200
+            loadData(isLoadMore = true)
+        }
     }
 
     val filteredList = pendingData.filter { item ->
@@ -153,7 +185,7 @@ fun DuareSorkarPfUpdateScreen() {
                 colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = primaryColor, focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface)
             )
 
-            FloatingActionButton(onClick = { loadData() }, containerColor = primaryColor, contentColor = Color.White, shape = CircleShape, modifier = Modifier.size(48.dp)) {
+            FloatingActionButton(onClick = { loadData(isLoadMore = false) }, containerColor = primaryColor, contentColor = Color.White, shape = CircleShape, modifier = Modifier.size(48.dp)) {
                 if (isLoading) CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                 else Icon(Icons.Default.Refresh, contentDescription = "Refresh")
             }
@@ -174,7 +206,7 @@ fun DuareSorkarPfUpdateScreen() {
                     }
                 }
             } else {
-                LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                LazyColumn(state = listState, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(filteredList) { item ->
                         DSPfPendingCard(
                             item = item,
@@ -182,6 +214,13 @@ fun DuareSorkarPfUpdateScreen() {
                             globalTo = globalSettings?.period_to ?: "",
                             onAccept = { from, to -> acceptRow(item, from, to) }
                         )
+                    }
+                    if (isLoading && pendingData.isNotEmpty()) {
+                        item {
+                            Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(color = primaryColor, modifier = Modifier.size(24.dp))
+                            }
+                        }
                     }
                 }
             }

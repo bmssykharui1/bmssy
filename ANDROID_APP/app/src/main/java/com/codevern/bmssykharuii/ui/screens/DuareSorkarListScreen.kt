@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -38,17 +39,42 @@ fun DuareSorkarListScreen() {
     var dsRecords by remember { mutableStateOf<List<DsRecord>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var searchQuery by remember { mutableStateOf("") }
-    
-    fun loadData() {
+    var offset by remember { mutableStateOf(0) }
+
+    val listState = rememberLazyListState()
+
+    val isAtBottom by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+            if (layoutInfo.totalItemsCount == 0) {
+                false
+            } else {
+                val lastVisibleItem = visibleItemsInfo.last()
+                lastVisibleItem.index + 1 == layoutInfo.totalItemsCount
+            }
+        }
+    }
+
+    fun loadData(isLoadMore: Boolean = false) {
+        if (!isLoadMore) {
+            offset = 0
+            dsRecords = emptyList()
+        }
         isLoading = true
         coroutineScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    val res = SupabaseApi.client.from("ds_record").select {
+                    val result = SupabaseApi.client.from("ds_record").select {
                         order("id", io.github.jan.supabase.postgrest.query.Order.DESCENDING)
-                        limit(200)
+                        range(offset.toLong(), offset.toLong() + 99L)
                     }.decodeList<DsRecord>()
-                    dsRecords = res
+                    
+                    if (isLoadMore) {
+                        dsRecords = dsRecords + result
+                    } else {
+                        dsRecords = result
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -61,6 +87,13 @@ fun DuareSorkarListScreen() {
 
     LaunchedEffect(Unit) {
         loadData()
+    }
+
+    LaunchedEffect(isAtBottom) {
+        if (isAtBottom && !isLoading && dsRecords.isNotEmpty()) {
+            offset += 100
+            loadData(isLoadMore = true)
+        }
     }
 
     val filteredList = dsRecords.filter { item ->
@@ -84,7 +117,7 @@ fun DuareSorkarListScreen() {
                 colors = OutlinedTextFieldDefaults.colors(focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface, focusedBorderColor = MaterialTheme.colorScheme.primary, focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface)
             )
 
-            FloatingActionButton(onClick = { loadData() }, containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary, shape = CircleShape, modifier = Modifier.size(48.dp)) {
+            FloatingActionButton(onClick = { loadData(isLoadMore = false) }, containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary, shape = CircleShape, modifier = Modifier.size(48.dp)) {
                 if (isLoading) CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                 else Icon(Icons.Default.Refresh, contentDescription = "Refresh")
             }
@@ -100,9 +133,16 @@ fun DuareSorkarListScreen() {
                     Text("No records found.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             } else {
-                LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                LazyColumn(state = listState, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(filteredList) { item ->
                         DSListCard(item = item)
+                    }
+                    if (isLoading && dsRecords.isNotEmpty()) {
+                        item {
+                            Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+                            }
+                        }
                     }
                 }
             }

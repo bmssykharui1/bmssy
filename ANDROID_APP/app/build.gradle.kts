@@ -16,8 +16,8 @@ android {
         applicationId = "com.codevern.bmssykharuii"
         minSdk = 24
         targetSdk = 36
-        versionCode = 3
-        versionName = "2.4.36.853.4"
+        versionCode = 4
+        versionName = "3.6.12.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

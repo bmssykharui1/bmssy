@@ -1,5 +1,6 @@
 import { getDashboardStats } from '@/app/actions/dashboard';
 import { LayoutDashboard, Server, MemoryStick as Memory, Users, UserPlus, AlertCircle, FileCheck, CheckCircle2 } from 'lucide-react';
+import AnimatedChart from './AnimatedChart';
 
 export default async function DashboardPage() {
   const stats = await getDashboardStats();
@@ -10,42 +11,22 @@ export default async function DashboardPage() {
         <div className="topbar-left">
           <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <LayoutDashboard size={28} style={{ color: 'var(--primary)' }} />
-            Overview
+            Dashboard Overview
           </h1>
         </div>
       </header>
 
       <div className="content-scroll">
         
-        {/* Hardware usage mock - Since Next.js doesn't easily expose raw CPU/RAM of the hosting container without specific packages, we show a fast static/mock layout as placeholders, but they look premium. */}
-        <div className="grid grid-2" style={{ marginBottom: '8px' }}>
-          <div className="md-card">
-            <div className="card-row">
-              <div>
-                <div className="card-label">CPU TRAFFIC</div>
-                <div className="card-value">24<small>%</small></div>
-              </div>
-              <div className="icon-circle bg-blue">
-                <Server size={24} />
-              </div>
-            </div>
-          </div>
+        {/* Animated Custom Chart Component */}
+        <AnimatedChart 
+          pf142={stats.pf142} 
+          pf242={stats.pf242} 
+          totalRejected={stats.totalRejected} 
+        />
 
-          <div className="md-card">
-            <div className="card-row">
-              <div>
-                <div className="card-label">RAM USAGE</div>
-                <div className="card-value">48<small>%</small></div>
-              </div>
-              <div className="icon-circle bg-red">
-                <Memory size={24} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="section-title" style={{ marginTop: '2rem' }}>SSIN Statistics</div>
-        <div className="grid grid-4">
+        <div className="section-title animate-enter delay-2" style={{ marginTop: '2rem' }}>SSIN Statistics</div>
+        <div className="grid grid-4 animate-enter delay-2">
           <div className="md-card" style={{ padding: '20px' }}>
             <div className="card-label" style={{ color: 'var(--color-success)' }}>OTHERS</div>
             <div className="card-value">{stats.count142}</div>
@@ -64,8 +45,8 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="section-title" style={{ marginTop: '2rem' }}>Performance Data</div>
-        <div className="grid grid-3">
+        <div className="section-title animate-enter delay-3" style={{ marginTop: '2rem' }}>Detailed Performance Metrics</div>
+        <div className="grid grid-3 animate-enter delay-3">
           <div className="md-card">
             <div className="deco-circle bg-green"></div>
             <div className="card-label">PF OTHERS</div>
@@ -92,8 +73,8 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="section-title" style={{ marginTop: '2rem' }}>Activity Timeline</div>
-        <div className="grid grid-3">
+        <div className="section-title animate-enter delay-4" style={{ marginTop: '2rem' }}>Activity Timeline</div>
+        <div className="grid grid-3 animate-enter delay-4">
           <div className="md-card" style={{ alignItems: 'center', textAlign: 'center' }}>
             <div className="card-label">NEW ADD (TODAY)</div>
             <div className="card-value" style={{ color: 'var(--color-info)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

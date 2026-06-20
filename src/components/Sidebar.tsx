@@ -30,6 +30,10 @@ export default function Sidebar({ agent }: { agent: { id: string, name: string, 
     }));
   };
 
+  const closeAllMenus = () => {
+    setOpenMenus({ pfupdate: false, ds: false, list: false, form4: false });
+  };
+
   const isActive = (path: string) => pathname === path;
 
   return (
@@ -45,16 +49,16 @@ export default function Sidebar({ agent }: { agent: { id: string, name: string, 
 
       <nav className="sb-nav">
         {/* Dashboard */}
-        <Link href="/dashboard" className={`sb-item ${isActive('/dashboard') ? 'active' : ''}`}>
-          <div className="sb-item-left" style={{ color: '#0b57d0' }}>
+        <Link href="/dashboard" className={`sb-item ${isActive('/dashboard') ? 'active' : ''}`} onClick={closeAllMenus}>
+          <div className="sb-item-left" style={{ color: 'var(--icon-dash)' }}>
             <LayoutDashboard size={20} />
             <span>Dashboard</span>
           </div>
         </Link>
 
         {/* Add New */}
-        <Link href="/addNew" className={`sb-item ${isActive('/addNew') ? 'active' : ''}`}>
-          <div className="sb-item-left" style={{ color: '#146c2e' }}>
+        <Link href="/addNew" className={`sb-item ${isActive('/addNew') ? 'active' : ''}`} onClick={closeAllMenus}>
+          <div className="sb-item-left" style={{ color: 'var(--icon-add)' }}>
             <PlusSquare size={20} />
             <span>Add New</span>
           </div>
@@ -64,7 +68,7 @@ export default function Sidebar({ agent }: { agent: { id: string, name: string, 
         {/* PF Updation */}
         <div>
           <button className={`sb-item ${pathname.startsWith('/pfupdate') ? 'active' : ''}`} onClick={() => toggleMenu('pfupdate')}>
-            <div className="sb-item-left" style={{ color: '#6750a4' }}>
+            <div className="sb-item-left" style={{ color: 'var(--icon-pf)' }}>
               <FileCheck size={20} />
               <span>PF Updation</span>
             </div>
@@ -86,7 +90,7 @@ export default function Sidebar({ agent }: { agent: { id: string, name: string, 
         {/* Duare Sorkar */}
         <div>
           <button className={`sb-item ${pathname.startsWith('/ds') ? 'active' : ''}`} onClick={() => toggleMenu('ds')}>
-            <div className="sb-item-left" style={{ color: '#b36b00' }}>
+            <div className="sb-item-left" style={{ color: 'var(--icon-ds)' }}>
               <Users size={20} />
               <span>Duare Sorkar</span>
             </div>
@@ -108,7 +112,7 @@ export default function Sidebar({ agent }: { agent: { id: string, name: string, 
         {/* Lists */}
         <div>
           <button className={`sb-item ${pathname.startsWith('/list') ? 'active' : ''}`} onClick={() => toggleMenu('list')}>
-            <div className="sb-item-left" style={{ color: '#b3261e' }}>
+            <div className="sb-item-left" style={{ color: 'var(--icon-list)' }}>
               <List size={20} />
               <span>Lists</span>
             </div>
@@ -133,7 +137,7 @@ export default function Sidebar({ agent }: { agent: { id: string, name: string, 
         {/* Form 4 */}
         <div>
           <button className={`sb-item ${pathname.startsWith('/form4') ? 'active' : ''}`} onClick={() => toggleMenu('form4')}>
-            <div className="sb-item-left" style={{ color: '#0d9488' }}>
+            <div className="sb-item-left" style={{ color: 'var(--icon-form)' }}>
               <FilePlus size={20} />
               <span>Form 4</span>
             </div>

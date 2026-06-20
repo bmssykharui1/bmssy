@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -57,8 +58,28 @@ fun AllDataListScreen() {
     var advSsin by remember { mutableStateOf("") }
     var advName by remember { mutableStateOf("") }
     var advPhone by remember { mutableStateOf("") }
+    var offset by remember { mutableStateOf(0) }
 
-    fun loadData() {
+    val listState = rememberLazyListState()
+
+    val isAtBottom by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+            if (layoutInfo.totalItemsCount == 0) {
+                false
+            } else {
+                val lastVisibleItem = visibleItemsInfo.last()
+                lastVisibleItem.index + 1 == layoutInfo.totalItemsCount
+            }
+        }
+    }
+
+    fun loadData(isLoadMore: Boolean = false) {
+        if (!isLoadMore) {
+            offset = 0
+            beneficiaries = emptyList()
+        }
         isLoading = true
         coroutineScope.launch {
             try {
@@ -72,9 +93,14 @@ fun AllDataListScreen() {
                             }
                         }
                         order("id", io.github.jan.supabase.postgrest.query.Order.DESCENDING)
-                        limit(100) 
+                        range(offset.toLong(), offset.toLong() + 99L)
                     }.decodeList<BeneficiaryItem>()
-                    beneficiaries = result
+                    
+                    if (isLoadMore) {
+                        beneficiaries = beneficiaries + result
+                    } else {
+                        beneficiaries = result
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -89,6 +115,13 @@ fun AllDataListScreen() {
 
     LaunchedEffect(Unit) {
         loadData()
+    }
+
+    LaunchedEffect(isAtBottom) {
+        if (isAtBottom && !isLoading && beneficiaries.isNotEmpty()) {
+            offset += 100
+            loadData(isLoadMore = true)
+        }
     }
 
     val filteredList = if (isAdvancedSearch) beneficiaries else beneficiaries.filter {
@@ -221,16 +254,24 @@ fun AllDataListScreen() {
                 }
             } else if (filteredList.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No records found.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("No beneficiaries found.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             } else {
                 LazyColumn(
+                    state = listState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(filteredList) { item ->
                         BeneficiaryCard(item = item)
+                    }
+                    if (isLoading && beneficiaries.isNotEmpty()) {
+                        item {
+                            Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+                            }
+                        }
                     }
                 }
             }

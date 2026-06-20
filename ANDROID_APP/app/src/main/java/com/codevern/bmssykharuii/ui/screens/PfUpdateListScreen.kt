@@ -5,8 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Numbers
@@ -48,13 +49,38 @@ fun PfUpdateListScreen() {
     val coroutineScope = rememberCoroutineScope()
 
     var mergedData by remember { mutableStateOf<List<PfListMergedItem>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
+    var isLoading by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     
     // Type Filter (All, 142, 242)
     var typeFilter by remember { mutableStateOf("All") }
+    var dateFrom by remember { mutableStateOf("") }
+    var dateTo by remember { mutableStateOf("") }
+    
+    var offset by remember { mutableStateOf(0) }
+    var hasSearched by remember { mutableStateOf(false) }
 
-    fun loadData() {
+    val listState = rememberLazyListState()
+
+    val isAtBottom by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+            if (layoutInfo.totalItemsCount == 0) {
+                false
+            } else {
+                val lastVisibleItem = visibleItemsInfo.last()
+                lastVisibleItem.index + 1 == layoutInfo.totalItemsCount
+            }
+        }
+    }
+
+    fun loadData(isLoadMore: Boolean = false) {
+        if (!isLoadMore) {
+            offset = 0
+            mergedData = emptyList()
+        }
+        hasSearched = true
         isLoading = true
         coroutineScope.launch {
             try {
@@ -66,9 +92,15 @@ fun PfUpdateListScreen() {
                             if (typeFilter != "All") {
                                 like("approved_ssin", "$typeFilter%")
                             }
+                            if (dateFrom.isNotBlank()) {
+                                gte("period_form", dateFrom)
+                            }
+                            if (dateTo.isNotBlank()) {
+                                lte("period_to", dateTo)
+                            }
                         }
                         order("id", io.github.jan.supabase.postgrest.query.Order.DESCENDING)
-                        limit(150)
+                        range(offset.toLong(), offset.toLong() + 49L)
                     }.decodeList<PfUpdateEntry>()
 
                     if (pfUpdates.isNotEmpty()) {
@@ -87,13 +119,17 @@ fun PfUpdateListScreen() {
                                 approved_ssin = pf.approved_ssin ?: "N/A",
                                 period_form = pf.period_form ?: "-",
                                 period_to = pf.period_to ?: "-",
-                                last_update = "Recent", // the table has last_update but we didn't map it in our generic model, using Recent
+                                last_update = "Recent",
                                 date_of_60 = bMap[pf.approved_ssin]?.date_of_attaining_60 ?: "N/A"
                             )
                         }
-                        mergedData = mappedData
+                        if (isLoadMore) {
+                            mergedData = mergedData + mappedData
+                        } else {
+                            mergedData = mappedData
+                        }
                     } else {
-                        mergedData = emptyList()
+                        if (!isLoadMore) mergedData = emptyList()
                     }
                 }
             } catch (e: Exception) {
@@ -105,8 +141,11 @@ fun PfUpdateListScreen() {
         }
     }
 
-    LaunchedEffect(typeFilter) {
-        loadData()
+    LaunchedEffect(isAtBottom) {
+        if (isAtBottom && !isLoading && mergedData.isNotEmpty()) {
+            offset += 50
+            loadData(isLoadMore = true)
+        }
     }
 
     val filteredList = mergedData.filter {
@@ -163,19 +202,46 @@ fun PfUpdateListScreen() {
             }
         }
 
-        // Type Filter Tabs
-        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("All", "142", "242").forEach { type ->
-                val isSelected = typeFilter == type
-                FilterChip(
-                    selected = isSelected,
-                    onClick = { typeFilter = type },
-                    label = { Text(if (type == "All") "All Types" else if (type == "142") "Others (142)" else "Construction (242)") },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primary,
-                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+        // Date Filters
+        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            DatePickerField(
+                label = "Period From",
+                date = dateFrom,
+                onDateSelected = { dateFrom = it },
+                modifier = Modifier.weight(1f),
+                primaryColor = MaterialTheme.colorScheme.primary
+            )
+            DatePickerField(
+                label = "Period To",
+                date = dateTo,
+                onDateSelected = { dateTo = it },
+                modifier = Modifier.weight(1f),
+                primaryColor = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        // Type Filter Tabs & Search
+        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.weight(1f)) {
+                listOf("All", "142", "242").forEach { type ->
+                    val isSelected = typeFilter == type
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { typeFilter = type },
+                        label = { Text(if (type == "All") "All" else if (type == "142") "Others" else "Construction") },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     )
-                )
+                }
+            }
+            Button(
+                onClick = { loadData(isLoadMore = false) },
+                shape = RoundedCornerShape(100.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Text("Search")
             }
         }
 
@@ -189,18 +255,30 @@ fun PfUpdateListScreen() {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
+            } else if (!hasSearched) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Enter filters and click Search to load data.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             } else if (filteredList.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("No records found.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             } else {
                 LazyColumn(
+                    state = listState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(filteredList) { item ->
                         PfUpdateLedgerCard(item = item)
+                    }
+                    if (isLoading && mergedData.isNotEmpty()) {
+                        item {
+                            Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+                            }
+                        }
                     }
                 }
             }

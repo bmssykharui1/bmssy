@@ -18,7 +18,7 @@ export default function PFUpdateListPage() {
   const [typeFilter, setTypeFilter] = useState('');
   
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 20;
+  const rowsPerPage = 35;
 
   // Set default dates on mount and load data
   useEffect(() => {
@@ -26,8 +26,15 @@ export default function PFUpdateListPage() {
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
     const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
     
-    const initialFrom = firstDay.toISOString().split('T')[0];
-    const initialTo = lastDay.toISOString().split('T')[0];
+    const formatLocal = (date: Date) => {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    };
+    
+    const initialFrom = formatLocal(firstDay);
+    const initialTo = formatLocal(lastDay);
     
     setPeriodFrom(initialFrom);
     setPeriodTo(initialTo);
@@ -111,36 +118,36 @@ export default function PFUpdateListPage() {
     const title2 = `Code of LWFC: 4207112, Quarter: __________, Year: ${yStr}.`;
     
     autoTable(doc, {
-      startY: 35,
+      startY: 28,
       head: headers,
       body: bodyData,
       theme: 'grid',
-      styles: { font: "helvetica", fontSize: 9, fontStyle: 'bold', cellPadding: 2, lineWidth: 0.3, lineColor: [0, 0, 0] },
-      headStyles: { font: "helvetica", fontSize: 8, fontStyle: 'bold', halign: 'center', valign: 'middle', lineWidth: 0.5, lineColor: [0, 0, 0], fillColor: [204, 153, 255], textColor: [0, 0, 0] },
+      styles: { font: "helvetica", fontSize: 7.5, fontStyle: 'bold', cellPadding: 1.5, lineWidth: 0.3, lineColor: [0, 0, 0] },
+      headStyles: { font: "helvetica", fontSize: 7.5, fontStyle: 'bold', halign: 'center', valign: 'middle', lineWidth: 0.5, lineColor: [0, 0, 0], fillColor: [204, 153, 255], textColor: [0, 0, 0] },
       bodyStyles: { halign: 'center', valign: 'middle', fontStyle: 'bold', lineWidth: 0.3, lineColor: [0, 0, 0], textColor: [0, 0, 0] },
-      margin: { top: 10, bottom: 50, left: 10, right: 10 },
+      margin: { top: 10, bottom: 25, left: 5, right: 5 },
       tableWidth: 'auto',
       didDrawPage: function (data: any) {
         const pageNumber = doc.internal.getNumberOfPages();
         if (pageNumber === 1) {
           doc.setFont("helvetica", "bold");
-          doc.setFontSize(12);
-          doc.text(title1, pageWidth / 2, 20, { align: "center" });
-          doc.text(title2, pageWidth / 2, 28, { align: "center" });
+          doc.setFontSize(11);
+          doc.text(title1, pageWidth / 2, 14, { align: "center" });
+          doc.text(title2, pageWidth / 2, 20, { align: "center" });
         }
 
         const totalPages = doc.internal.getNumberOfPages();
         if (pageNumber === totalPages) {
-          const yAfterTable = data.cursor.y + 10;
+          const yAfterTable = data.cursor.y + 6;
           doc.setFont("helvetica", "normal");
-          doc.setFontSize(10);
+          doc.setFontSize(8);
           const footerText = "*Strike out whichever is not applicable. Certified that I have made all the relevant entries up to the quarter ending on___________________In the Passbook of the beneficiaries and all the data recorded in the above statement is in consonance with the entries made by me.";
-          const wrappedFooter = doc.splitTextToSize(footerText, pageWidth - 20);
-          doc.text(wrappedFooter, 10, yAfterTable);
+          const wrappedFooter = doc.splitTextToSize(footerText, pageWidth - 10);
+          doc.text(wrappedFooter, 5, yAfterTable);
 
-          const footerHeight = wrappedFooter.length * 5;
-          const signatureX = pageWidth - 15;
-          doc.text("_________________________\nSignature of the CA/SLO\nName: MAMATA JANA\nCode No.: 4207112", signatureX, yAfterTable + footerHeight + 5, { align: "right" });
+          const footerHeight = wrappedFooter.length * 3.5;
+          const signatureX = pageWidth - 10;
+          doc.text("_________________________\nSignature of the CA/SLO\nName: MAMATA JANA\nCode No.: 4207112", signatureX, yAfterTable + footerHeight + 4, { align: "right" });
         }
       }
     });

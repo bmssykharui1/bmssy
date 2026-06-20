@@ -44,6 +44,7 @@ fun AddNewBeneficiaryScreen() {
 
     var showNewDataForm by remember { mutableStateOf(false) }
     var existingProfile by remember { mutableStateOf<BeneficiaryItem?>(null) }
+    var pfHistory by remember { mutableStateOf<List<PfUpdateEntry>>(emptyList()) }
 
     var name by remember { mutableStateOf("") }
     var dateOf60 by remember { mutableStateOf("") }
@@ -59,6 +60,24 @@ fun AddNewBeneficiaryScreen() {
         phone = ""
         showNewDataForm = false
         existingProfile = null
+        pfHistory = emptyList()
+    }
+
+    fun calculateMonths(from: String?, to: String?): Int {
+        if (from.isNullOrBlank() || to.isNullOrBlank()) return 0
+        try {
+            val fParts = from.split("-")
+            val tParts = to.split("-")
+            
+            val fYear = if (fParts[0].length == 4) fParts[0].toInt() else fParts[2].toInt()
+            val fMonth = if (fParts[0].length == 4) fParts[1].toInt() else fParts[1].toInt()
+            val tYear = if (tParts[0].length == 4) tParts[0].toInt() else tParts[2].toInt()
+            val tMonth = if (tParts[0].length == 4) tParts[1].toInt() else tParts[1].toInt()
+            
+            return (tYear - fYear) * 12 + (tMonth - fMonth) + 1
+        } catch (e: Exception) {
+            return 0
+        }
     }
 
     fun verifySSIN() {
@@ -76,13 +95,20 @@ fun AddNewBeneficiaryScreen() {
                     }.decodeSingleOrNull<BeneficiaryItem>()
                     
                     if (result != null) {
+                        val history = SupabaseApi.client.from("pf_update").select {
+                            filter { eq("approved_ssin", ssin) }
+                            order("id", io.github.jan.supabase.postgrest.query.Order.DESCENDING)
+                        }.decodeList<PfUpdateEntry>()
+
                         existingProfile = result
+                        pfHistory = history
                         showNewDataForm = false
                         withContext(Dispatchers.Main) {
                             Toast.makeText(context, "SSIN Found in Database", Toast.LENGTH_SHORT).show()
                         }
                     } else {
                         existingProfile = null
+                        pfHistory = emptyList()
                         showNewDataForm = true
                         withContext(Dispatchers.Main) {
                             Toast.makeText(context, "New SSIN. Please fill the details.", Toast.LENGTH_SHORT).show()
@@ -249,46 +275,99 @@ fun AddNewBeneficiaryScreen() {
             enter = fadeIn() + slideInVertically()
         ) {
             existingProfile?.let { profile ->
-                Card(
-                    modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = primaryGreen),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-                ) {
-                    Column(modifier = Modifier.padding(24.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier.size(48.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.2f)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(Icons.Default.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
+                Column {
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = primaryGreen),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(24.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier.size(48.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.2f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Default.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
+                                }
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Column {
+                                    Text("SSIN Profile", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                    Text(profile.beneficiary_name ?: "", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
+                                }
                             }
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Column {
-                                Text("SSIN Profile", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                                Text(profile.beneficiary_name ?: "", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Divider(color = Color.White.copy(alpha = 0.3f))
+                            Spacer(modifier = Modifier.height(16.dp))
+                            
+                            ProfileRow(icon = Icons.Default.Numbers, label = "SSIN", value = profile.approved_ssin ?: "")
+                            ProfileRow(icon = Icons.Default.CalendarToday, label = "Age 60 Date", value = profile.date_of_attaining_60 ?: "")
+                            ProfileRow(icon = Icons.Default.Phone, label = "Mobile", value = profile.phone_no ?: "")
+                        }
+                    }
+
+                // 3rd Card: PF Update History & Calculation
+                if (pfHistory.isNotEmpty()) {
+                    pfHistory.forEach { pf ->
+                        val months = calculateMonths(pf.period_form, pf.period_to)
+                        val amount = months * 55
+                        
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text("PF Update History", fontWeight = FontWeight.Bold, color = primaryBlue)
+                                Divider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text("Status:", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                                    Text(pf.reason ?: "Updated", fontSize = 14.sp, color = primaryGreen, fontWeight = FontWeight.Bold)
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text("Period:", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                                    Text("${pf.period_form} to ${pf.period_to}", fontSize = 14.sp, fontFamily = FontFamily.Monospace)
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text("Total Months:", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                                    Text("$months Months", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text("Calculated PF:", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                                    Text("₹$amount", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = primaryGreen)
+                                }
                             }
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Divider(color = Color.White.copy(alpha = 0.3f))
-                        Spacer(modifier = Modifier.height(16.dp))
-                        
-                        ProfileRow(icon = Icons.Default.Numbers, label = "SSIN", value = profile.approved_ssin ?: "")
-                        ProfileRow(icon = Icons.Default.CalendarToday, label = "Age 60 Date", value = profile.date_of_attaining_60 ?: "")
-                        ProfileRow(icon = Icons.Default.Phone, label = "Mobile", value = profile.phone_no ?: "")
-                        
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Button(
-                            onClick = { resetForm() },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = primaryGreen),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Search Another SSIN", fontWeight = FontWeight.Bold)
+                    }
+                } else {
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Default.Info, contentDescription = null, tint = Color.Gray)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("No PF Update History Found", color = Color.Gray, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
-            }
-        }
+
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(
+                    onClick = { resetForm() },
+                    colors = ButtonDefaults.buttonColors(containerColor = primaryBlue, contentColor = Color.White),
+                    modifier = Modifier.fillMaxWidth().height(56.dp)
+                ) {
+                    Text("Search Another SSIN", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                }
+                } // End of Column
+            } // End of existingProfile?.let
+        } // End of AnimatedVisibility
     }
 }
 
